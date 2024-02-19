@@ -13,12 +13,11 @@ MODE		= $2B                   ; $00=XAM, $7F=STOR, $AE=BLOCK XAM
 IN		= $0200			; Input buffer
 
 RESET:
-                CLD                     ; Clear decimal arithmetic mode.
-                CLI
-                LDA     #$1F            ; 8-N-1, 19200 bps
+                LDA     #$1F           ; 8-N-1, 19200 baud.
                 STA     ACIA_CTRL
-                LDY     #$8B            ; No parity, no echo, no interrupts.
-                STY     ACIA_CMD
+                LDA     #$0B           ; No parity, no echo, no interrupts.
+                STA     ACIA_CMD
+                LDA     #$1B           ; Begin with escape.
 
 NOTCR:
                 CMP     #$08            ; Backspace key?
@@ -180,9 +179,9 @@ PRHEX:
                 ADC     #$06            ; Add offset for letter.
 
 ECHO:
-                STA     ACIA_DATA       ; Output character.
-                PHA                     ; Save A.
-                LDA     #$FF            ; Initialize delay loop.
+                PHA                    ; Save A.
+                STA     ACIA_DATA      ; Output character.
+                LDA     #$FF           ; Initialize delay loop.
 TXDELAY:        DEC                     ; Decrement A.
                 BNE     TXDELAY         ; Until A gets to 0.
                 PLA                     ; Restore A.
