@@ -1,23 +1,29 @@
 .setcpu "65C02"
 .segment "WOZMON"
 
-XAML		= $24                   ; Last "opened" location Low
-XAMH		= $25                   ; Last "opened" location High
-STL		= $26                   ; Store address Low
-STH		= $27                   ; Store address High
-L		= $28                   ; Hex value parsing Low
-H		= $29                   ; Hex value parsing High
-YSAV		= $2A                   ; Used to see if hex value is given
-MODE		= $2B                   ; $00=XAM, $7F=STOR, $AE=BLOCK XAM
+XAML = $24                              ; Last "opened" location Low
+XAMH = $25                              ; Last "opened" location High
+STL	= $26                               ; Store address Low
+STH	= $27                               ; Store address High
+L = $28                                 ; Hex value parsing Low
+H = $29                                 ; Hex value parsing High
+YSAV = $2A                              ; Used to see if hex value is given
+MODE = $2B                              ; $00=XAM, $7F=STOR, $AE=BLOCK XAM
 
-IN		= $0200			; Input buffer
+IN = $0200			                    ; Input buffer
 
-RESET:
-                LDA     #$1F           ; 8-N-1, 19200 baud.
+WOZMON:
+.ifdef CONFIG_LCD
+                jsr LCDCLEAR
+                lda #<TEXT_WOZ
+                ldy #>TEXT_WOZ 
+                jsr LCDPRINT
+.endif
+                LDA     #$1F            ; 8-N-1, 19200 baud.
                 STA     ACIA_CTRL
-                LDA     #$0B           ; No parity, no echo, no interrupts.
+                LDA     #$0B            ; No parity, no echo, no interrupts.
                 STA     ACIA_CMD
-                LDA     #$1B           ; Begin with escape.
+                LDA     #$1B            ; Begin with escape.
 
 NOTCR:
                 CMP     #$08            ; Backspace key?
@@ -179,9 +185,9 @@ PRHEX:
                 ADC     #$06            ; Add offset for letter.
 
 ECHO:
-                PHA                    ; Save A.
-                STA     ACIA_DATA      ; Output character.
-                LDA     #$FF           ; Initialize delay loop.
+                PHA                     ; Save A.                
+                STA     ACIA_DATA       ; Output character.                
+                LDA     #$FF            ; Initialize delay loop.
 TXDELAY:        DEC                     ; Decrement A.
                 BNE     TXDELAY         ; Until A gets to 0.
                 PLA                     ; Restore A.

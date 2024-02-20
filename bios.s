@@ -7,6 +7,37 @@ ACIA_STATUS	= $5001
 ACIA_CMD	= $5002
 ACIA_CTRL	= $5003
 
+PORTB = $6000                           ; VIA Port B
+PORTA = $6001                           ; VIA Port A
+DDRB = $6002                            ; Data Direction Register B
+DDRA = $6003                            ; Data Direction Register A
+
+.ifdef CONFIG_LCD
+.include "lcd.s"
+.endif
+
+RESET:
+
+                ldx #$ff                ; Set X to 0xff for the stack pointer
+                sei                     ; Disable interrupts
+                txs                     ; Clear the stack
+                cld                     ; Clear decimal mode
+
+                lda #%11111111          ; Set PORTB pins to output
+                ldx #%11100000          ; Set firt 3 pins for PORTA to ouput
+                jsr DDRINIT
+
+.ifdef CONFIG_LCD
+                jsr LCDINIT
+.endif
+                jmp WOZMON              ; Boot into WOZMON
+
+DDRINIT:
+                sta DDRB                ; Configure DDRB from A param
+                stx DDRA                ; Configure DDRA from X param
+
+                rts
+
 LOAD:
                 rts
 

@@ -12,5 +12,11 @@
         jmp     PR_WRITTEN_BY
 .endif
 .ifdef EATER
-        jmp COLD_START
+  .ifdef CONFIG_LCD
+        jsr LCDCLEAR
+        lda #<TEXT_BASIC
+        ldy #>TEXT_BASIC 
+        jsr LCDPRINT
+  .endif
+        jmp     COLD_START
 .endif
