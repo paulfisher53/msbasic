@@ -18,6 +18,7 @@ These are the first ten (known) versions of Microsoft BASIC for 6502:
 | Commodore BASIC 2   |  1979    |              |  Y   |   Y    |    $0200     |     CBM     | CONFIG_2A  |
 | KBD BASIC           |  1982    |              |  Y   |   N    |    $0700     |     KBD     | CONFIG_2B  |
 | MicroTAN            |  1980    |              |  Y   |   Y    |      ZP      |      -      | CONFIG_2C  |
+| Ben Eater 6502      |  2024    |              |  Y   |   Y    |    $0200     |     CBM     | CONFIG_2A  |
 
 (Note that this assembly source cannot (yet) build AppleSoft II.)
 
@@ -50,9 +51,24 @@ The following symbols can be defined in addition:
 | CONFIG_SCRTCH_ORDER               | where in the init code to call SCRTCH
 | CONFIG_SMALL                      | use 6 digit FP instead of 9 digit, use 2 character error messages, don't have GET
 | CONFIG_SMALL_ERROR                | use 2 character error messages
+| CONFIG_LCD                        | support for LCD screen (BE6502)
 
 Changing symbol definitions can alter an existing base configuration, but it not guaranteed to assemble
 or work correctly.
+
+## Ben Eater 6502
+
+New WOZMON test program (note the change of address for ECHO from FFEF to FF03):
+
+```
+0:A9 00 AA 20 03 FF E8 8A 4C 02 00 
+```
+
+To enter BASIC from WOZMON, type:
+
+```
+8000 R
+```
 
 ## More Information
 
