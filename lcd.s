@@ -5,14 +5,6 @@ E  = %10000000
 RW = %01000000
 RS = %00100000
 
-TEXT_WOZ:
-                .byte   "WOZMON <        "
-                .byte   "BASIC           "
-
-TEXT_BASIC:
-                .byte   "WOZMON          "
-                .byte   "BASIC <         "
-
 LCDCLEAR:
                 pha                     ; Save A
             
@@ -36,37 +28,6 @@ LCDCLEARLOOP:
 
                 rts
 
-LCDPRINT:
-                ldx #0                  ; set offset to 0 as default
-                jsr LCDPRINTOFF
-
-                rts
-
-LCDPRINTOFF:
-                sta LCD_STR_BUFF
-                sty LCD_STR_BUFF+1
-                stx LCD_STR_OFFSET
-                ldy #0
-
-LCDPRINTLOOP:
-                clc
-                
-                tya
-                adc LCD_STR_OFFSET      ; Add offset to loop iterator
-                tax                     ; and store in X
-
-                lda (LCD_STR_BUFF),y    ; Load character at pos Y
-                beq LCDPRINTEXIT        ; If we reach 0x00 exit loop
-
-                sta LCD_SCREEN,x        ; Store character to video memory
-                iny
-
-                jmp LCDPRINTLOOP
-
-LCDPRINTEXIT:
-                jsr LCDRENDER               ; Render video memory to LCD
-                rts
-
 LCDINIT:
                 lda #%00111000          ; Set 8 bit mode, 2 lines, 5x8 font
                 jsr LCDSENDINST
@@ -82,12 +43,7 @@ LCDSETCUR:
 
 LCDSETCUR2:
                 pha                     ; Save A
-
-.ifndef CONFIG_EMULATOR
                 lda #%11000000          ; Set cursor to line 2    
-.else
-                lda #%10100000          ; Set cursor to line 2  
-.endif
         
                 jsr LCDSENDINST
 

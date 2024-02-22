@@ -13,12 +13,6 @@ MODE = $2B                              ; $00=XAM, $7F=STOR, $AE=BLOCK XAM
 IN = $0200			                    ; Input buffer
 
 WOZMON:
-.ifdef CONFIG_LCD
-                jsr LCDCLEAR
-                lda #<TEXT_WOZ
-                ldy #>TEXT_WOZ 
-                jsr LCDPRINT
-.endif
                 LDA     #$1F            ; 8-N-1, 19200 baud.
                 STA     ACIA_CTRL
                 LDA     #$0B            ; No parity, no echo, no interrupts.

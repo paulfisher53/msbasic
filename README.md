@@ -76,6 +76,20 @@ New BASIC Commands:
 | --------------------------------- | --------------------------------------------------------------------------------
 | WOZMON                            | Jumps back to WOZMON
 
+New BIOS Functions:
+
+| Function                          | Description
+| --------------------------------- | --------------------------------------------------------------------------------
+| LCDCLEAR                          | Clear the LCD buffer in RAM
+| LCDRENDER                         | Render the LCD buffer in RAM to the LCD screen
+| LCDSENDDATA                       | Send the character in the A register to the LCD screen
+
+New Variables in RAM:
+
+| Variable                          | Description
+| --------------------------------- | --------------------------------------------------------------------------------
+| LCD_SCREEN                        | LCD buffer - 2 rows, 16 columns ($03CE - $0400 / 974 - 1024)
+
 Jump Table for BE6502 BIOS:
 
 | BIOS Function                     | Vector (Hex / Decimal)
@@ -83,7 +97,7 @@ Jump Table for BE6502 BIOS:
 | RESET                             | $FD00 / 64768
 | WOZMON                            | $FD03 / 64771
 | LCDCLEAR                          | $FD06 / 64774
-| LCDPRINT                          | $FD09 / 64777
+| LCDRENDER                         | $FD09 / 64777
 | LCDSENDDATA                       | $FD0C / 64780
 
 This can be useful for calling BIOS functions from BASIC. Example BASIC to print a character to LCD:
