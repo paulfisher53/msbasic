@@ -70,6 +70,30 @@ To enter BASIC from WOZMON, type:
 8000 R
 ```
 
+New BASIC Commands:
+
+| Command                           | Description
+| --------------------------------- | --------------------------------------------------------------------------------
+| WOZMON                            | Jumps back to WOZMON
+
+Jump Table for BE6502 BIOS:
+
+| BIOS Function                     | Vector (Hex / Decimal)
+| --------------------------------- | --------------------------------------------------------------------------------
+| RESET                             | $FD00 / 64768
+| WOZMON                            | $FD03 / 64771
+| LCDCLEAR                          | $FD06 / 64774
+| LCDPRINT                          | $FD09 / 64777
+| LCDSENDDATA                       | $FD0C / 64780
+
+This can be useful for calling BIOS functions from BASIC. Example BASIC to print a character to LCD:
+
+```
+POKE 780,80
+SYS 64780
+```
+The first line saves an ASCII "P" to the Storage area for the A register. The second line calls the jump table at 64780 (LCDSENDDATA).
+
 ## More Information
 
 More information on the differences of the respective versions can be found on this blog entry: [Create your own Version of Microsoft BASIC for 6502](http://www.pagetable.com/?p=46).
