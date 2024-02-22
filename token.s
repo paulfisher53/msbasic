@@ -79,6 +79,7 @@
 .endif
 		keyword_rts "NEW", NEW
 .ifdef EATER
+		keyword_rts "SYS", SYS
 		keyword_rts "WOZMON", WOZMON
 .endif
 
