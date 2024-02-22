@@ -12,6 +12,10 @@ PORTA = $6001                           ; VIA Port A
 DDRB = $6002                            ; Data Direction Register B
 DDRA = $6003                            ; Data Direction Register A
 
+LCD_STR_BUFF = $00FB                    ; LCD String Buffer (2 bytes)
+LCD_STR_OFFSET = $00FD                  ; LCD String Offset
+LCD_SCREEN = $04C0                      ; LCD Screen Memory - 32 bytes (2 rows, 16 columns)
+
 SAREG = $30C                            ; Storage Area for .A Register (Accumulator)
 SXREG = $30D                            ; Storage Area for .X Index Register
 SYREG = $30E                            ; Storage Area for .Y Index Register
@@ -70,7 +74,7 @@ SYSRETURN=*-1
                 sty SYREG
                 pla                     ; Get status reg
                 sta SPREG
-                rts
+                rts 
 
 
 ; Input a character from the serial interface.
