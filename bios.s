@@ -76,7 +76,6 @@ SYSRETURN=*-1
                 sta SPREG
                 rts 
 
-
 ; Input a character from the serial interface.
 ; On return, carry flag indicates whether a key was pressed
 ; If a key was pressed, the key value will be in the A register
@@ -108,6 +107,8 @@ CHROUT:
                 bne     @txdelay
                 pla
                 rts
+
+.include "vectors.s"
 
 .include "wozmon.s"
 
