@@ -58,10 +58,12 @@ or work correctly.
 
 ## Ben Eater 6502
 
-New WOZMON test program (note the change of address for ECHO from FFEF to FF03):
+New WOZMON test program (note the change of address for ECHO from FFEF to FEF9):
 
 ```
-0:A9 00 AA 20 03 FF E8 8A 4C 02 00 
+0:A9 00 AA 20 F9 FE E8 8A 4C 02 00 
+0.A
+R
 ```
 
 To enter BASIC from WOZMON, type:
