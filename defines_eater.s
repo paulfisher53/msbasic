@@ -12,7 +12,7 @@ ZP_START3 = $60
 ZP_START4 = $6B
 
 ; extra/override ZP variables
-USR := GORESTART
+USR := $310
 
 ; constants
 SPACE_FOR_GOSUB := $3E
