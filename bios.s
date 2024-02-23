@@ -12,7 +12,7 @@ PORTA = $6001                           ; VIA Port A
 DDRB = $6002                            ; Data Direction Register B
 DDRA = $6003                            ; Data Direction Register A
 
-LCD_SCREEN = $03CE                      ; LCD Screen Memory - 32 bytes (2 rows, 16 columns)
+LCD_SCREEN = $03E0                      ; LCD Screen Memory - 32 bytes (2 rows, 16 columns)
 
 SAREG = $30C                            ; Storage Area for .A Register (Accumulator)
 SXREG = $30D                            ; Storage Area for .X Index Register

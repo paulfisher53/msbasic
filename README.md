@@ -90,7 +90,7 @@ New Variables in RAM:
 
 | Variable                          | Description
 | --------------------------------- | --------------------------------------------------------------------------------
-| LCD_SCREEN                        | LCD buffer - 2 rows, 16 columns ($03CE - $0400 / 974 - 1024)
+| LCD_SCREEN                        | LCD buffer - 32 bytes ($03E0 - $0400 / 992 - 1024)
 
 Jump Table for BE6502 BIOS:
 
