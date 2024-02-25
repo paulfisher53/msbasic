@@ -37,12 +37,26 @@ RESET:
 .ifdef CONFIG_LCD
                 jsr LCDINIT
 .endif
+                jsr CLRRAM              ; Clear RAM
+
                 jmp WOZMON              ; Boot into WOZMON
 
 DDRINIT:
                 sta DDRB                ; Configure DDRB from A param
                 stx DDRA                ; Configure DDRA from X param
 
+                rts
+            
+CLRRAM:
+
+                lda #0                  ; Clear A
+                tay                     ; Clear Index
+CLRRAMLOOP:
+                sta $0000,y             ; Clear Page 0
+                sta $0200,y             ; Clear Page 2
+                sta $0300,y             ; Clear Page 3
+                iny
+                bne CLRRAMLOOP
                 rts
 
 LOAD:
