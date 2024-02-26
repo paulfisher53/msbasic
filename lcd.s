@@ -36,7 +36,12 @@ LCDINIT:
                 jsr LCDSENDINST
                 
                 lda #%00000110          ; Increment and shift cursor
-                jmp LCDSENDINST
+                jsr LCDSENDINST
+
+                lda #$00000001          ; Clear display     
+                jsr LCDSENDINST
+                
+                rts           
 
 LCDSETCUR:
                 jmp LCDSENDINST
