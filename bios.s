@@ -19,8 +19,26 @@ SXREG = $30D                            ; Storage Area for .X Index Register
 SYREG = $30E                            ; Storage Area for .Y Index Register
 SPREG = $30F                            ; Storage Area for .P (Status) Register
 
+SDADDR = $F9                            ; SD Address Pointer
+SDCURRSEC = $FB                         ; SD Current Sector
+
+LCD_E  = %10000000
+LCD_RW = %01000000
+LCD_RS = %00100000
+
+SD_CS   = %00010000
+SD_SCK  = %00001000
+SD_MOSI = %00000100
+SD_MISO = %00000010
+
+PORTA_OUTPUTPINS = LCD_E | LCD_RW | LCD_RS | SD_CS | SD_SCK | SD_MOSI
+
 .ifdef CONFIG_LCD
 .include "lcd.s"
+.endif
+
+.ifdef CONFIG_SD
+.include "sd.s"
 .endif
 
 RESET:
@@ -31,7 +49,7 @@ RESET:
                 cld                     ; Clear decimal mode
 
                 lda #%11111111          ; Set PORTB pins to output
-                ldx #%11100000          ; Set firt 3 pins for PORTA to ouput
+                ldx #PORTA_OUTPUTPINS    ; Set various pins on port A to output
                 jsr DDRINIT
 
 .ifdef CONFIG_LCD
@@ -87,6 +105,28 @@ SYSRETURN=*-1
                 pla                     ; Get status reg
                 sta SPREG
                 rts 
+
+PRINTHEX:
+                pha
+                ror
+                ror
+                ror
+                ror
+                jsr PRINTNYBBLE
+                pla
+                pha
+                jsr PRINTNYBBLE
+                pla
+                rts
+PRINTNYBBLE:
+                and #15
+                cmp #10
+                bmi SKIPLETTER
+                adc #6
+SKIPLETTER:
+                adc #48
+                jsr CHROUT
+                rts
 
 ; Input a character from the serial interface.
 ; On return, carry flag indicates whether a key was pressed
