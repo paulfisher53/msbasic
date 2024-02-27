@@ -1,8 +1,12 @@
 .setcpu "65C02"
 .segment "BIOS"
 
-SDININT:
+SDINIT:
   
+                lda     #<QT_SD_SEARCHING
+                ldy     #>QT_SD_SEARCHING
+                jsr     STROUT
+
                 lda #SD_CS | SD_MOSI
                 ldx #160                ; toggle the clock 160 times, so 80 low-high transitions
 SDINITLOOP:
@@ -79,15 +83,24 @@ SDDELAYLOOP:
                 jmp SDCMD55
 
 SDINITOK:
-                lda #'Y'
-                jsr CHROUT
+                lda     #<QT_SD_FOUND
+                ldy     #>QT_SD_FOUND
+                jsr     STROUT
                 rts
 
 SDINITFAIL:
-                lda #'X'
+                lda #'C'
                 jsr CHROUT
-SDFAILLOOP1:
-                jmp SDFAILLOOP1
+                ldx #0
+                lda (SDADDR,x)
+                jsr PRINTHEX
+                lda #' '
+                jsr CHROUT
+
+                lda     #<QT_SD_FAILED
+                ldy     #>QT_SD_FAILED
+                jsr     STROUT                
+                rts
 
 SD_CMD0_BYTES:
                 .byte $40, $00, $00, $00, $00, $95
@@ -150,13 +163,7 @@ SDWAITRESULT:                           ; Wait for the SD card to return somethi
                 beq SDWAITRESULT
                 rts
 
-SDSENDCMD:             
-                lda #'c'
-                jsr CHROUT
-                ldx #0
-                lda (SDADDR,x)
-                jsr PRINTHEX
-                                
+SDSENDCMD:                                                     
                 lda #SD_MOSI            ; pull CS low to begin command
                 sta PORTA
 
@@ -183,7 +190,7 @@ SDSENDCMD:
                 pha
 
                 ; Debug print the result code
-                jsr PRINTHEX
+                ;jsr PRINTHEX
 
                 ; End command
                 lda #SD_CS | SD_MOSI   ; set CS high again
@@ -237,8 +244,7 @@ SDREADFAIL:
                 jsr CHROUT
                 lda #'f'
                 jsr CHROUT
-SDFAILLOOP2:
-                jmp SDFAILLOOP2
+                rts
 
 SDREADPAGE:                             ; Read 256 bytes to the address at SDADDR
                 ldy #0
@@ -248,3 +254,13 @@ SDREADPAGELOOP:
                 iny
                 bne SDREADPAGELOOP
                 rts
+
+QT_SD_SEARCHING:
+                .byte "SEARCHING FOR SD..."
+                .byte   CR,LF,0
+QT_SD_FOUND:
+                .byte "SD FOUND"
+                .byte   CR,LF,0
+QT_SD_FAILED:
+                .byte "FAILED"
+                .byte   CR,LF,0

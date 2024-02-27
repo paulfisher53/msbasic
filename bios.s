@@ -19,9 +19,6 @@ SXREG = $30D                            ; Storage Area for .X Index Register
 SYREG = $30E                            ; Storage Area for .Y Index Register
 SPREG = $30F                            ; Storage Area for .P (Status) Register
 
-SDADDR = $F9                            ; SD Address Pointer
-SDCURRSEC = $FB                         ; SD Current Sector
-
 LCD_E  = %10000000
 LCD_RW = %01000000
 LCD_RS = %00100000
@@ -38,7 +35,15 @@ PORTA_OUTPUTPINS = LCD_E | LCD_RW | LCD_RS | SD_CS | SD_SCK | SD_MOSI
 .endif
 
 .ifdef CONFIG_SD
+
+SDADDR = $5E                            ; SD Address Pointer
+SDCURRSEC = $E3                         ; SD Current Sector
+FAT32VARS = $E7    
+FAT32BUFFER = $3E00      
+
 .include "sd.s"
+.include "fat32.s"
+
 .endif
 
 RESET:
@@ -78,6 +83,19 @@ CLRRAMLOOP:
                 rts
 
 LOAD:
+
+.ifdef CONFIG_SD
+                jsr SDINIT
+                jsr FAT32INIT
+                bcc initsuccess
+
+                ; Error during FAT32 initialization
+                lda #'Z'
+                jsr CHROUT
+                lda FAT32_ERRSTAGE
+                jsr PRINTHEX
+initsuccess:
+.endif
                 rts
 
 SAVE:
