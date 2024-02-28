@@ -474,8 +474,8 @@ FAT32FINDDIRENT:
   ; The directory should already be open for iteration.
 
   ; Form ZP pointer to user's filename
-  stx FAT32_FNAME
-  sty FAT32_FNAME+1
+  ;stx FAT32_FNAME
+  ;sty FAT32_FNAME+1
   
   ; Iterate until name is found or end of directory
 DIRENTLOOP:

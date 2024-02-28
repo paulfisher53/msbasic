@@ -82,19 +82,71 @@ CLRRAMLOOP:
                 bne CLRRAMLOOP
                 rts
 
+PARSELOADSAVE:
+                jsr SKIPJUNK      ;by-pass junk
+	            jsr SAVEFILENAME      ;get/set file name
+                rts
+
+SKIPJUNK:	
+                jsr CHRGOT
+                bne SKIPJUNKDONE
+                pla
+                pla
+SKIPJUNKDONE:	
+                rts
+
+SAVEFILENAME:
+                jsr FRMEVL
+                jsr FRESTR      ;length in .a
+                ldx INDEX
+                ldy INDEX+1
+
+                stx FAT32_FNAME
+                sty FAT32_FNAME+1
+                rts
+
 LOAD:
 
 .ifdef CONFIG_SD
+
+                jsr PARSELOADSAVE
+
                 jsr SDINIT
                 jsr FAT32INIT
-                bcc initsuccess
+                bcc INITSUCCESS
 
                 ; Error during FAT32 initialization
                 lda #'Z'
                 jsr CHROUT
                 lda FAT32_ERRSTAGE
                 jsr PRINTHEX
-initsuccess:
+                rts
+
+INITSUCCESS:
+                ; Open root directory
+                jsr FAT32OPENROOT
+
+                ; Find file by name
+                jsr FAT32FINDDIRENT
+                bcc FOUNDFILE
+
+                ; File not found
+                lda #'Y'
+                jsr CHROUT
+                rts
+
+FOUNDFILE:
+                ; Open file
+                jsr FAT32OPENDIRENT
+
+                ; Read file contents into program area
+                lda #<RAMSTART2
+                sta FAT32_ADDR
+                lda #>RAMSTART2
+                sta FAT32_ADDR+1
+
+                jsr FAT32FILEREAD
+
 .endif
                 rts
 

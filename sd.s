@@ -163,7 +163,15 @@ SDWAITRESULT:                           ; Wait for the SD card to return somethi
                 beq SDWAITRESULT
                 rts
 
-SDSENDCMD:                                                     
+SDSENDCMD:                  
+                lda #'C'
+                jsr CHROUT
+                ldx #0
+                lda (SDADDR,x)
+                jsr PRINTHEX
+                lda #' '
+                jsr CHROUT
+
                 lda #SD_MOSI            ; pull CS low to begin command
                 sta PORTA
 
@@ -190,7 +198,7 @@ SDSENDCMD:
                 pha
 
                 ; Debug print the result code
-                ;jsr PRINTHEX
+                jsr PRINTHEX
 
                 ; End command
                 lda #SD_CS | SD_MOSI   ; set CS high again
@@ -238,12 +246,9 @@ SDREADSECTOR:
                 rts
 
 SDREADFAIL:
-                lda #'s'
-                jsr CHROUT
-                lda #':'
-                jsr CHROUT
-                lda #'f'
-                jsr CHROUT
+                lda     #<QT_SD_READ_FAILED
+                ldy     #>QT_SD_READ_FAILED
+                jsr     STROUT
                 rts
 
 SDREADPAGE:                             ; Read 256 bytes to the address at SDADDR
@@ -263,4 +268,7 @@ QT_SD_FOUND:
                 .byte   CR,LF,0
 QT_SD_FAILED:
                 .byte "FAILED"
+                .byte   CR,LF,0
+QT_SD_READ_FAILED:
+                .byte " READ FAILED"
                 .byte   CR,LF,0
