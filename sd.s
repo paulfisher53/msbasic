@@ -1,3 +1,6 @@
+; From https://github.com/gfoot/sdcard6502
+; and https://github.com/liaminventions/sdcard6502
+
 .setcpu "65C02"
 .segment "BIOS"
 
@@ -245,9 +248,80 @@ SDREADPAGELOOP:
                 bne SDREADPAGELOOP
                 rts
 
+SDWRITEFAIL:
+                jsr PRINTHEX
+
+                lda     #<QT_SD_WRITE_FAILED
+                ldy     #>QT_SD_WRITE_FAILED
+                jsr     STROUT
+                rts
+
+SDWRITESECTOR:
+                lda #SD_MOSI
+                sta PORTA
+
+                ; Command 24, arg is sector number, crc not checked
+                lda #$58                    ; CMD24 - WRITE_BLOCK
+                jsr SDWRITEBYTE
+                lda SDCURRSEC+3   ; sector 24:31
+                jsr SDWRITEBYTE
+                lda SDCURRSEC+2   ; sector 16:23
+                jsr SDWRITEBYTE
+                lda SDCURRSEC+1   ; sector 8:15
+                jsr SDWRITEBYTE
+                lda SDCURRSEC     ; sector 0:7
+                jsr SDWRITEBYTE
+                lda #$01                    ; crc (not checked)
+                jsr SDWRITEBYTE
+
+                jsr SDWAITRESULT
+                cmp #$00
+                bne SDWRITEFAIL
+
+                ; Send start token
+                lda #$fe
+                jsr SDWRITEBYTE
+
+                ; Need to write 512 bytes - two pages of 256 bytes each
+                jsr SDWRITEPAGE
+                inc SDADDR+1
+                jsr SDWRITEPAGE
+                dec SDADDR+1
+
+                ; wait for data response
+                jsr SDWAITRESULT
+                and #$1f
+                cmp #$05
+                bne SDWRITEFAIL
+
+SDWAITIDLE:
+                jsr SDREADBYTE
+                cmp #$ff
+                bne SDWAITIDLE
+
+                ; End command
+                lda #SD_CS | SD_MOSI ; set cs and mosi high (disconnected)
+                sta PORTA
+
+                rts
+
+SDWRITEPAGE:                            ; Write 256 bytes fom SDADDR
+                ldy #0
+SDWRITELOOP2:
+                lda (SDADDR),y
+                phy
+                jsr SDWRITEBYTE
+                ply
+                iny
+                bne SDWRITELOOP2
+                rts
+
 QT_SD_FAILED:
                 .byte "FAILED"
                 .byte   CR,LF,0
 QT_SD_READ_FAILED:
                 .byte " READ FAILED"
+                .byte   CR,LF,0
+QT_SD_WRITE_FAILED:
+                .byte " WRITE FAILED"
                 .byte   CR,LF,0

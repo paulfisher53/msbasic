@@ -37,8 +37,7 @@ PORTA_OUTPUTPINS = LCD_E | LCD_RW | LCD_RS | SD_CS | SD_SCK | SD_MOSI
 .ifdef CONFIG_SD
 
 SDADDR = $5E                            ; SD Address Pointer
-SDCURRSEC = $E3                         ; SD Current Sector
-FAT32VARS = $E7    
+SDCURRSEC = $E3                         ; SD Current Sector  
 FAT32BUFFER = $3E00      
 
 .include "sd.s"
@@ -101,8 +100,8 @@ SAVEFILENAME:
                 ldx INDEX
                 ldy INDEX+1
 
-                stx FAT32_FNAME
-                sty FAT32_FNAME+1
+                stx FAT32_FNPOINTER
+                sty FAT32_FNPOINTER+1
                 rts
 
 LOAD:
