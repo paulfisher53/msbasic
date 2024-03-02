@@ -56,6 +56,10 @@ RESET:
                 ldx #PORTA_OUTPUTPINS    ; Set various pins on port A to output
                 jsr DDRINIT
 
+                lda #<QT_BANNER
+                ldy #>QT_BANNER
+                jsr STROUT 
+
 .ifdef CONFIG_LCD
                 jsr LCDINIT
 .endif
@@ -250,6 +254,10 @@ CHROUT:
                 pla
                 rts
 
+QT_BANNER:
+                .byte "BE6502 Computer",CR,LF,CR,LF   
+                .byte "8000R = Microsoft BASIC",CR,LF,CR,LF
+                .byte "$0400 - $3FFF = User RAM",CR,LF,0
 QT_SEARCHING:
                 .byte "SEARCHING FOR ",0        
 QT_LOADING:
