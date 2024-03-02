@@ -83,8 +83,8 @@ CLRRAMLOOP:
                 rts
 
 PARSELOADSAVE:
-                jsr SKIPJUNK      ;by-pass junk
-	            jsr SAVEFILENAME      ;get/set file name
+                jsr SKIPJUNK            ; By-pass junk
+	            jsr SAVEFILENAME        ; Get/set file name
                 rts
 
 SKIPJUNK:	
@@ -109,11 +109,28 @@ LOAD:
 
 .ifdef CONFIG_SD
 
+                lda #<QT_SEARCHING
+                ldy #>QT_SEARCHING
+                jsr STROUT         
+
+                ; Parse arguments
                 jsr PARSELOADSAVE
+
+                ; Print filename
+                txa
+                jsr STROUT
+                lda #<QT_CRLF
+                ldy #>QT_CRLF
+                jsr STROUT  
 
                 jsr SDINIT
                 jsr FAT32INIT
-                bcc INITSUCCESS
+                bcc INITSUCCESS                
+
+                ; SD init failed
+                lda #<QT_SDINITFAILED
+                ldy #>QT_SDINITFAILED
+                jsr STROUT      
 
                 ; Error during FAT32 initialization
                 lda #'Z'
@@ -123,6 +140,10 @@ LOAD:
                 rts
 
 INITSUCCESS:
+                lda #<QT_LOADING
+                ldy #>QT_LOADING
+                jsr STROUT     
+
                 ; Open root directory
                 jsr FAT32OPENROOT
 
@@ -130,9 +151,9 @@ INITSUCCESS:
                 jsr FAT32FINDDIRENT
                 bcc FOUNDFILE
 
-                ; File not found
-                lda #'Y'
-                jsr CHROUT
+                lda #<QT_FILENOTFOUND
+                ldy #>QT_FILENOTFOUND
+                jsr STROUT    
                 rts
 
 FOUNDFILE:
@@ -229,6 +250,17 @@ CHROUT:
                 bne     @txdelay
                 pla
                 rts
+
+QT_SEARCHING:
+                .byte "SEARCHING FOR ",0        
+QT_LOADING:
+                .byte "LOADING",CR,LF,0
+QT_CRLF:                
+                .byte CR,LF,0          
+QT_SDINITFAILED:
+                .byte "SD INIT FAILED",CR,LF,0                                 
+QT_FILENOTFOUND:
+                .byte "FILE NOT FOUND",CR,LF,0                                                 
 
 .include "vectors.s"
 

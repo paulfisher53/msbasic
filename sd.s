@@ -2,11 +2,6 @@
 .segment "BIOS"
 
 SDINIT:
-  
-                lda     #<QT_SD_SEARCHING
-                ldy     #>QT_SD_SEARCHING
-                jsr     STROUT
-
                 lda #SD_CS | SD_MOSI
                 ldx #160                ; toggle the clock 160 times, so 80 low-high transitions
 SDINITLOOP:
@@ -82,10 +77,7 @@ SDDELAYLOOP:
 
                 jmp SDCMD55
 
-SDINITOK:
-                lda     #<QT_SD_FOUND
-                ldy     #>QT_SD_FOUND
-                jsr     STROUT
+SDINITOK:                
                 rts
 
 SDINITFAIL:
@@ -160,18 +152,10 @@ SDSENDBIT:
 SDWAITRESULT:                           ; Wait for the SD card to return something other than $ff
                 jsr SDREADBYTE
                 cmp #$ff
-                beq SDWAITRESULT
+                beq SDWAITRESULT                
                 rts
 
 SDSENDCMD:                  
-                lda #'C'
-                jsr CHROUT
-                ldx #0
-                lda (SDADDR,x)
-                jsr PRINTHEX
-                lda #' '
-                jsr CHROUT
-
                 lda #SD_MOSI            ; pull CS low to begin command
                 sta PORTA
 
@@ -197,7 +181,6 @@ SDSENDCMD:
                 jsr SDWAITRESULT
                 pha
 
-                ; Debug print the result code
                 jsr PRINTHEX
 
                 ; End command
@@ -246,6 +229,8 @@ SDREADSECTOR:
                 rts
 
 SDREADFAIL:
+                jsr PRINTHEX
+
                 lda     #<QT_SD_READ_FAILED
                 ldy     #>QT_SD_READ_FAILED
                 jsr     STROUT
@@ -260,12 +245,6 @@ SDREADPAGELOOP:
                 bne SDREADPAGELOOP
                 rts
 
-QT_SD_SEARCHING:
-                .byte "SEARCHING FOR SD..."
-                .byte   CR,LF,0
-QT_SD_FOUND:
-                .byte "SD FOUND"
-                .byte   CR,LF,0
 QT_SD_FAILED:
                 .byte "FAILED"
                 .byte   CR,LF,0
