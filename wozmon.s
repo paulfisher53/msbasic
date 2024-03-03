@@ -182,5 +182,3 @@ TXDELAY:        DEC                     ; Decrement A.
                 BNE     TXDELAY         ; Until A gets to 0.
                 PLA                     ; Restore A.
                 RTS                     ; Return.
-
-

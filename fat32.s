@@ -4,26 +4,6 @@
 .setcpu "65C02"
 .segment "BIOS"
 
-;ZP VARIABLES
-FAT32_REMAIN            = $E7  ; 4 bytes 
-FAT32_ERRSTAGE          = FAT32_REMAIN  ; only used during initialization
-FAT32_FNPOINTER         = $F5  ; 2 bytes
-FAT32_LASTCLUSTER       = $F7  ; 4 bytes
-FAT32_NEXT              = $FB  ; 4 bytes
-
-;OTHER VARIABLES
-FAT32_FATSTART          = $33C  ; 4 bytes
-FAT32_DATASTART         = $340  ; 4 bytes
-FAT32_ROOTCLUSTER       = $344  ; 4 bytes
-FAT32_SECTORS           = $348  ; 1 byte
-FAT32_PENDSECTORS       = $349  ; 1 byte
-FAT32_ADDR              = $34A  ; 2 bytes
-FAT32_LASTFREECLUSTER   = $350  ; 4 bytes
-FAT32_LASTSECTOR        = $358  ; 4 bytes
-FAT32_NUMFATS           = $35C  ; 1 byte
-FAT32_FILECLUSTER       = $35D  ; 4 bytes
-FAT32_SECTORSPERFAT     = $361  ; 4 bytes
-
 FSTYPE_FAT32 = 12
 
 FAT32INIT:

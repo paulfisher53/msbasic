@@ -58,20 +58,6 @@ or work correctly.
 
 ## Ben Eater 6502
 
-New WOZMON test program (note the change of address for ECHO from FFEF to FEF9):
-
-```
-0:A9 00 AA 20 F9 FE E8 8A 4C 02 00 
-0.A
-R
-```
-
-To enter BASIC from WOZMON, type:
-
-```
-8000 R
-```
-
 New BASIC Commands:
 
 | Command                           | Description
@@ -96,19 +82,19 @@ Jump Table for BE6502 BIOS:
 
 | BIOS Function                     | Vector (Hex / Decimal)
 | --------------------------------- | --------------------------------------------------------------------------------
-| RESET                             | $FD00 / 64768
-| WOZMON                            | $FD03 / 64771
-| LCDCLEAR                          | $FD06 / 64774
-| LCDRENDER                         | $FD09 / 64777
-| LCDSENDDATA                       | $FD0C / 64780
+| RESET                             | $FE00 / 65024
+| WOZMON                            | $FE03 / 65027
+| LCDCLEAR                          | $FE06 / 65030
+| LCDRENDER                         | $FE09 / 65033
+| LCDSENDDATA                       | $FE0C / 65036
 
 This can be useful for calling BIOS functions from BASIC. Example BASIC to print a character to LCD:
 
 ```
 POKE 780,80
-SYS 64780
+SYS 65036
 ```
-The first line saves an ASCII "P" to the Storage area for the A register. The second line calls the jump table at 64780 (LCDSENDDATA).
+The first line saves an ASCII "P" to the Storage area for the A register. The second line calls the jump table at 65036 (LCDSENDDATA).
 
 ## More Information
 

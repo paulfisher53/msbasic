@@ -2,22 +2,44 @@
 .debuginfo
 .segment "BIOS"
 
-ACIA_DATA	= $5000
-ACIA_STATUS	= $5001
-ACIA_CMD	= $5002
-ACIA_CTRL	= $5003
+;ZERO PAGE VARIABLES
+SDADDR                  = $5E           ; SD Address Pointer
+SDCURRSEC               = $E3           ; SD Current Sector  
+FAT32_REMAIN            = $E7           ; 4 bytes 
+FAT32_ERRSTAGE          = FAT32_REMAIN  ; only used during initialization
+FAT32_FNPOINTER         = $F5           ; 2 bytes
+FAT32_LASTCLUSTER       = $F7           ; 4 bytes
+FAT32_NEXT              = $FB           ; 4 bytes
 
-PORTB = $6000                           ; VIA Port B
-PORTA = $6001                           ; VIA Port A
-DDRB = $6002                            ; Data Direction Register B
-DDRA = $6003                            ; Data Direction Register A
+;PAGE 3 VARIABLES
+SAREG                   = $30C          ; Storage Area for .A Register (Accumulator)
+SXREG                   = $30D          ; Storage Area for .X Index Register
+SYREG                   = $30E          ; Storage Area for .Y Index Register
+SPREG                   = $30F          ; Storage Area for .P (Status) Register
+FAT32_FATSTART          = $33C          ; 4 bytes
+FAT32_DATASTART         = $340          ; 4 bytes
+FAT32_ROOTCLUSTER       = $344          ; 4 bytes
+FAT32_SECTORS           = $348          ; 1 byte
+FAT32_PENDSECTORS       = $349          ; 1 byte
+FAT32_ADDR              = $34A          ; 2 bytes
+FAT32_LASTFREECLUSTER   = $350          ; 4 bytes
+FAT32_LASTSECTOR        = $358          ; 4 bytes
+FAT32_NUMFATS           = $35C          ; 1 byte
+FAT32_FILECLUSTER       = $35D          ; 4 bytes
+FAT32_SECTORSPERFAT     = $361          ; 4 bytes
+LCD_SCREEN              = $3E0          ; LCD Screen Memory - 32 bytes (2 rows, 16 columns)
 
-LCD_SCREEN = $03E0                      ; LCD Screen Memory - 32 bytes (2 rows, 16 columns)
+FAT32BUFFER             = $3E00         ; 512 bytes - At end of user RAM
 
-SAREG = $30C                            ; Storage Area for .A Register (Accumulator)
-SXREG = $30D                            ; Storage Area for .X Index Register
-SYREG = $30E                            ; Storage Area for .Y Index Register
-SPREG = $30F                            ; Storage Area for .P (Status) Register
+ACIA_DATA	            = $5000
+ACIA_STATUS	            = $5001
+ACIA_CMD	            = $5002
+ACIA_CTRL	            = $5003
+
+PORTB                   = $6000         ; VIA Port B
+PORTA                   = $6001         ; VIA Port A
+DDRB                    = $6002         ; Data Direction Register B
+DDRA                    = $6003         ; Data Direction Register A
 
 LCD_E  = %10000000
 LCD_RW = %01000000
@@ -34,15 +56,9 @@ PORTA_OUTPUTPINS = LCD_E | LCD_RW | LCD_RS | SD_CS | SD_SCK | SD_MOSI
 .include "lcd.s"
 .endif
 
-.ifdef CONFIG_SD
-
-SDADDR = $5E                            ; SD Address Pointer
-SDCURRSEC = $E3                         ; SD Current Sector  
-FAT32BUFFER = $3E00      
-
+.ifdef CONFIG_SD  
 .include "sd.s"
 .include "fat32.s"
-
 .endif
 
 RESET:
@@ -115,8 +131,8 @@ PARSELOADSAVE:
                 rts
 
 LOAD:
-.ifdef CONFIG_SD
 
+.ifdef CONFIG_SD
                 lda #<QT_SEARCHING
                 ldy #>QT_SEARCHING
                 jsr STROUT         
@@ -180,7 +196,6 @@ LOAD:
                 jmp @DIRENTLOOP                                  
 
 @FINDFILE:
-
                 ; Find file by name
                 jsr FAT32FINDDIRENT
                 bcc @FOUNDFILE
@@ -320,7 +335,7 @@ SYS:
                 ldx SXREG
                 ldy SYREG
                 plp                     ; Load 6502 status reg
-                jmp (LINNUM)           ; Go do it
+                jmp (LINNUM)            ; Go do it
 SYSRETURN=*-1                
                 php                     ; Save status reg
                 sta SAREG               ; Save 6502 regs
