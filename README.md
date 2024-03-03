@@ -52,6 +52,7 @@ The following symbols can be defined in addition:
 | CONFIG_SMALL                      | use 6 digit FP instead of 9 digit, use 2 character error messages, don't have GET
 | CONFIG_SMALL_ERROR                | use 2 character error messages
 | CONFIG_LCD                        | support for LCD screen (BE6502)
+| CONFIG_SD                         | support for SD card (BE6502)
 
 Changing symbol definitions can alter an existing base configuration, but it not guaranteed to assemble
 or work correctly.
