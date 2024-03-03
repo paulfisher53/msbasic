@@ -177,11 +177,72 @@ LOAD:
                 sta FAT32_ADDR+1
 
                 jsr FAT32FILEREAD
-
 .endif
                 rts
 
 SAVE:
+
+.ifdef CONFIG_SD
+                lda #<QT_SAVING
+                ldy #>QT_SAVING
+                jsr STROUT         
+
+                ; Parse arguments
+                jsr PARSELOADSAVE
+
+                ; Print filename
+                lda FAT32_FNPOINTER
+                ldy FAT32_FNPOINTER+1
+                jsr STROUT
+
+                lda #<QT_CRLF
+                ldy #>QT_CRLF
+                jsr STROUT  
+
+                jsr SDINIT
+                jsr FAT32INIT
+                bcc @INITSUCCESS                
+
+                ; SD init failed
+                lda #<QT_SDINITFAILED
+                ldy #>QT_SDINITFAILED
+                jsr STROUT      
+
+                ; Error during FAT32 initialization
+                lda #'Z'
+                jsr CHROUT
+                lda FAT32_ERRSTAGE
+                jsr PRINTHEX
+                rts
+
+@INITSUCCESS:
+                sec
+                lda VARTAB
+                sbc TXTTAB
+                sta FAT32_REMAIN
+                pha
+                lda VARTAB+1
+                sbc TXTTAB+1
+                sta FAT32_REMAIN+1
+                pha
+                
+                jsr FAT32ALLOCATEFILE
+
+                jsr FAT32OPENROOT
+
+                pla 
+                sta FAT32_REMAIN+1
+                pla
+                sta FAT32_REMAIN
+                jsr FAT32WRITEDIRENT
+
+                lda #<RAMSTART2
+                sta FAT32_ADDR
+                lda #>RAMSTART2
+                sta FAT32_ADDR+1
+                jsr FAT32FILEWRITE
+.endif
+
                 rts
 
 SYS:                
@@ -274,7 +335,9 @@ QT_CRLF:
 QT_SDINITFAILED:
                 .byte "SD INIT FAILED",CR,LF,0                                 
 QT_FILENOTFOUND:
-                .byte "FILE NOT FOUND",CR,LF,0                                                 
+                .byte "FILE NOT FOUND",CR,LF,0      
+QT_SAVING:
+                .byte CR,LF,"SAVING ",0                                           
 
 .include "vectors.s"
 
