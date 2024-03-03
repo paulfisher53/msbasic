@@ -1,9 +1,12 @@
 .setcpu "65C02"
 .segment "JMPTBL"
 
-jmp RESET                               ; $FD00 / 64768
-jmp WOZMON                              ; $FD03 / 64771
-jmp LCDCLEAR                            ; $FD06 / 64774
-jmp LCDRENDER                           ; $FD09 / 64777
-jmp LCDSENDDATA                         ; $FD0C / 64780
-                         
+                jmp RESET               ; $FE00 / 65024
+                jmp WOZMON              ; $FE03 / 65027
+.ifdef CONFIG_LCD
+                jmp LCDCLEAR            ; $FE06 / 65030
+                jmp LCDRENDER           ; $FE09 / 65033
+                jmp LCDSENDDATA         ; $FE0C / 65036
+.else
+                .res 9
+.endif                        
