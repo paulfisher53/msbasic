@@ -157,6 +157,30 @@ LOAD:
                 ; Open root directory
                 jsr FAT32OPENROOT
 
+                ldy #00
+                lda (FAT32_FNPOINTER)
+                cmp #$2A
+                bne @FINDFILE
+
+                ; List files
+@DIRENTLOOP:
+                jsr FAT32READDIRENT
+                bcc @PRINTDIRENT                
+                rts
+
+@PRINTDIRENT:
+                lda SDADDR
+                ldy SDADDR+1
+                jsr STROUT 
+
+                lda #<QT_CRLF
+                ldy #>QT_CRLF
+                jsr STROUT
+
+                jmp @DIRENTLOOP                                  
+
+@FINDFILE:
+
                 ; Find file by name
                 jsr FAT32FINDDIRENT
                 bcc @FOUNDFILE
@@ -177,8 +201,35 @@ LOAD:
                 sta FAT32_ADDR+1
 
                 jsr FAT32FILEREAD
+
+                ; Fix pointers
+                jsr RESETVARTAB
+                ;jsr FIX_LINKS
+
 .endif
                 rts
+
+RESETVARTAB:                
+                lda #<RAMSTART2
+                sta VARTAB
+                lda #>RAMSTART2
+                sta VARTAB+1
+
+                ldy #00
+                
+@LOOPSTART:                         
+                lda (VARTAB),y
+                cmp #$AA
+                beq @SAVE
+
+                iny
+                bne @LOOPSTART
+                inc VARTAB+1
+                jmp @LOOPSTART
+
+@SAVE:
+                sty VARTAB
+                rts               
 
 SAVE:
 
@@ -216,6 +267,17 @@ SAVE:
                 rts
 
 @INITSUCCESS:
+
+                ; Open root directory
+                jsr FAT32OPENROOT
+
+                ; Find file by name
+                jsr FAT32FINDDIRENT
+                bcs @WRITEFILE
+
+                jsr FAT32DELFILE
+
+@WRITEFILE:
                 sec
                 lda VARTAB
                 sbc TXTTAB
