@@ -81,6 +81,7 @@
 .ifdef EATER
 		keyword_rts "SYS", SYS
 		keyword_rts "WOZMON", WOZMON
+		keyword_rts "MONITOR", MONITOR
 .endif
 
 		count_tokens

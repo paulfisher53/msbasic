@@ -16,6 +16,9 @@ SAREG                   = $30C          ; Storage Area for .A Register (Accumula
 SXREG                   = $30D          ; Storage Area for .X Index Register
 SYREG                   = $30E          ; Storage Area for .Y Index Register
 SPREG                   = $30F          ; Storage Area for .P (Status) Register
+CINV	                = $314          ; irq ram vector
+CBINV                   = $316          ; brk instr ram vector
+NMINV                   = $318          
 FAT32_FATSTART          = $33C          ; 4 bytes
 FAT32_DATASTART         = $340          ; 4 bytes
 FAT32_ROOTCLUSTER       = $344          ; 4 bytes
@@ -63,7 +66,7 @@ PORTA_OUTPUTPINS = LCD_E | LCD_RW | LCD_RS | SD_CS | SD_SCK | SD_MOSI
 
 RESET:
                 ldx #$ff                ; Set X to 0xff for the stack pointer
-                sei                     ; Disable interrupts
+                ;sei                     ; Disable interrupts
                 txs                     ; Clear the stack
                 cld                     ; Clear decimal mode
 
@@ -416,6 +419,16 @@ QT_FILENOTFOUND:
 QT_SAVING:
                 .byte CR,LF,"SAVING ",0                                           
 
+PULS:
+                pha
+                txa
+                pha
+                tya
+                pha
+                jmp (CBINV)             ;break instr
+
+.include "supermon64.s"
+
 .include "vectors.s"
 
 .include "wozmon.s"
@@ -423,5 +436,5 @@ QT_SAVING:
 .segment "RESETVEC"
                 .word   $0F00           ; NMI vector
                 .word   RESET           ; RESET vector
-                .word   $0000           ; IRQ vector
+                .word   PULS            ; IRQ vector
 
