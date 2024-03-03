@@ -13,10 +13,6 @@ MODE = $2B                              ; $00=XAM, $7F=STOR, $AE=BLOCK XAM
 IN = $0200			                    ; Input buffer
 
 WOZMON:
-                LDA     #$1F            ; 8-N-1, 19200 baud.
-                STA     ACIA_CTRL
-                LDA     #$0B            ; No parity, no echo, no interrupts.
-                STA     ACIA_CMD
                 LDA     #$1B            ; Begin with escape.
 
 NOTCR:
@@ -186,5 +182,3 @@ TXDELAY:        DEC                     ; Decrement A.
                 BNE     TXDELAY         ; Until A gets to 0.
                 PLA                     ; Restore A.
                 RTS                     ; Return.
-
-

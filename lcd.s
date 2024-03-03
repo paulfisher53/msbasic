@@ -1,10 +1,6 @@
 .setcpu "65C02"
 .segment "BIOS"
 
-E  = %10000000
-RW = %01000000
-RS = %00100000
-
 LCDCLEAR:
                 pha                     ; Save A
             
@@ -87,7 +83,7 @@ LCDDELAY:
             lda #0                      ; Clear RS/RW/E bits
             sta PORTA
 
-            lda #RW                     ; Set RW mode
+            lda #LCD_RW                     ; Set RW mode
             sta PORTA
 
             bit PORTB                   ; Read LCD data
@@ -111,7 +107,7 @@ LCDDELAYLOOP:
 
             sta PORTB                   ; Write the A param (control byte)
 
-            lda #E                      ; Set E mode
+            lda #LCD_E                  ; Set E mode
             sta PORTA
 
             lda #0                      ; Clear RS/RW/E bits
@@ -122,7 +118,7 @@ LCDDELAYLOOP:
 LCDSENDDATA:
             sta PORTB                   ; Write A param to PORTB
 
-            lda #(RS | E)               ; Set RS and E mode
+            lda #(LCD_RS | LCD_E)               ; Set RS and E mode
             sta PORTA
 
             lda #0                      ; Clear RS/RW/E bits
