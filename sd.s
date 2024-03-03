@@ -184,7 +184,7 @@ SDSENDCMD:
                 jsr SDWAITRESULT
                 pha
 
-                jsr PRINTHEX
+                ;jsr PRINTHEX
 
                 ; End command
                 lda #SD_CS | SD_MOSI   ; set CS high again

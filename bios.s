@@ -46,15 +46,19 @@ FAT32BUFFER = $3E00
 .endif
 
 RESET:
-
                 ldx #$ff                ; Set X to 0xff for the stack pointer
                 sei                     ; Disable interrupts
                 txs                     ; Clear the stack
                 cld                     ; Clear decimal mode
 
                 lda #%11111111          ; Set PORTB pins to output
-                ldx #PORTA_OUTPUTPINS    ; Set various pins on port A to output
+                ldx #PORTA_OUTPUTPINS   ; Set various pins on port A to output
                 jsr DDRINIT
+
+                lda #$1F                ; 8-N-1, 19200 baud.
+                sta ACIA_CTRL
+                lda #$0B                ; No parity, no echo, no interrupts.
+                sta ACIA_CMD
 
                 lda #<QT_BANNER
                 ldy #>QT_BANNER
@@ -63,6 +67,9 @@ RESET:
 .ifdef CONFIG_LCD
                 jsr LCDINIT
 .endif
+.ifdef CONFIG_SD
+                jsr SDINIT
+.endif
                 jsr CLRRAM              ; Clear RAM
 
                 jmp WOZMON              ; Boot into WOZMON
@@ -70,46 +77,44 @@ RESET:
 DDRINIT:
                 sta DDRB                ; Configure DDRB from A param
                 stx DDRA                ; Configure DDRA from X param
-
                 rts
             
 CLRRAM:
-
                 lda #0                  ; Clear A
                 tay                     ; Clear Index
-CLRRAMLOOP:
+@LOOP:
                 sta $0000,y             ; Clear Page 0
                 sta $0200,y             ; Clear Page 2
                 sta $0300,y             ; Clear Page 3
                 iny
-                bne CLRRAMLOOP
+                bne @LOOP
                 rts
 
 PARSELOADSAVE:
-                jsr SKIPJUNK            ; By-pass junk
-	            jsr SAVEFILENAME        ; Get/set file name
+                jsr @SKIPJUNK            ; By-pass junk
+	            jsr @SAVEFILENAME        ; Get/set file name
                 rts
 
-SKIPJUNK:	
+@SKIPJUNK:	
                 jsr CHRGOT
-                bne SKIPJUNKDONE
+                bne @DONE
                 pla
                 pla
-SKIPJUNKDONE:	
+@DONE:	
                 rts
 
-SAVEFILENAME:
+@SAVEFILENAME:
                 jsr FRMEVL
-                jsr FRESTR      ;length in .a
+                ;jsr FRESTR      ;length in .a
+                
                 ldx INDEX
                 ldy INDEX+1
-
                 stx FAT32_FNPOINTER
                 sty FAT32_FNPOINTER+1
+
                 rts
 
 LOAD:
-
 .ifdef CONFIG_SD
 
                 lda #<QT_SEARCHING
@@ -120,15 +125,17 @@ LOAD:
                 jsr PARSELOADSAVE
 
                 ; Print filename
-                txa
+                lda FAT32_FNPOINTER
+                ldy FAT32_FNPOINTER+1
                 jsr STROUT
+
                 lda #<QT_CRLF
                 ldy #>QT_CRLF
                 jsr STROUT  
 
                 jsr SDINIT
                 jsr FAT32INIT
-                bcc INITSUCCESS                
+                bcc @INITSUCCESS                
 
                 ; SD init failed
                 lda #<QT_SDINITFAILED
@@ -142,7 +149,7 @@ LOAD:
                 jsr PRINTHEX
                 rts
 
-INITSUCCESS:
+@INITSUCCESS:
                 lda #<QT_LOADING
                 ldy #>QT_LOADING
                 jsr STROUT     
@@ -152,14 +159,14 @@ INITSUCCESS:
 
                 ; Find file by name
                 jsr FAT32FINDDIRENT
-                bcc FOUNDFILE
+                bcc @FOUNDFILE
 
                 lda #<QT_FILENOTFOUND
                 ldy #>QT_FILENOTFOUND
                 jsr STROUT    
                 rts
 
-FOUNDFILE:
+@FOUNDFILE:
                 ; Open file
                 jsr FAT32OPENDIRENT
 
@@ -255,9 +262,9 @@ CHROUT:
                 rts
 
 QT_BANNER:
-                .byte "BE6502 Computer",CR,LF,CR,LF   
+                .byte CR,LF,CR,LF,"BE6502 Computer",CR,LF,CR,LF   
                 .byte "8000R = Microsoft BASIC",CR,LF,CR,LF
-                .byte "$0400 - $3FFF = User RAM",CR,LF,0
+                .byte "$0400 - $3FFF = User RAM",CR,LF,CR,LF,0
 QT_SEARCHING:
                 .byte "SEARCHING FOR ",0        
 QT_LOADING:

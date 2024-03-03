@@ -6,10 +6,10 @@
 
 ;ZP VARIABLES
 FAT32_REMAIN            = $E7  ; 4 bytes 
-FAT32_ERRSTAGE          = FAT32_REMAIN  ; only used during initializatio
-FAT32_FNPOINTER         = $EB  ; 2 bytes
-FAT32_LASTCLUSTER       = $ED  ; 4 bytes
-FAT32_NEXT              = $F1  ; 4 bytes
+FAT32_ERRSTAGE          = FAT32_REMAIN  ; only used during initialization
+FAT32_FNPOINTER         = $F5  ; 2 bytes
+FAT32_LASTCLUSTER       = $F7  ; 4 bytes
+FAT32_NEXT              = $FB  ; 4 bytes
 
 ;OTHER VARIABLES
 FAT32_FATSTART          = $33C  ; 4 bytes
