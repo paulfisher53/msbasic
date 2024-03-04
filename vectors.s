@@ -9,4 +9,5 @@
                 jmp LCDSENDDATA         ; $FE0C / 65036
 .else
                 .res 9
-.endif                        
+.endif          
+                jmp MONITOR             ; #FE08 / 65039              
