@@ -139,7 +139,7 @@ ST1:
         JSR GETCHR          ; get a character from the buffer
         BEQ STRT            ; start over if buffer is empty
         CMP #$20            ; skip leading spaces
-        BEQ ST1
+        BEQ ST1        
 S0:      
         LDX #KEYTOP-KEYW    ; loop through valid command characters
 S1:      
@@ -1404,10 +1404,10 @@ MSGBAS  =*
 MSG2:   .BYTE $0D               ; header for registers
         .BYTE "   PC  SR AC XR YR SP   V1.2"
         .BYTE $0D+$80
-MSG3:   .BYTE $1D,$3F+$80       ; syntax error: move right, display "?"
+MSG3:   .BYTE $20,$3F+$80       ; syntax error: move right, display "?"
 MSG4:   .BYTE "..SYS"           ; SYS call to enter monitor
         .BYTE $20+$80
-MSG5:   .BYTE $3A,$12+$80       ; ":" then RVS ON for memory ASCII dump
+MSG5:   .BYTE $3A,$20+$80       ; ":" then RVS ON for memory ASCII dump
 MSG6:   .BYTE " ERRO"           ; I/O error: display " ERROR"
         .BYTE "R",$20+$80
 MSG7:   .BYTE $41,$20+$80       ; assemble next instruction: "A " + addr
